@@ -2,31 +2,35 @@ import Link from "next/link";
 import CartCount from "./CartCount";
 
 const navLinks = [
-  { href: "/", label: "Accueil" },
-  { href: "/produits", label: "Produits" },
+  { href: "/produits", label: "Catalogue" },
   { href: "/a-propos", label: "À propos" },
-  { href: "/contact", label: "Contact" },
 ];
 
 export default function Navbar() {
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-foreground/10 bg-background/80 backdrop-blur-sm">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+    <header className="sticky top-0 z-50 w-full border-b border-[--border-color] bg-[--background]/90 backdrop-blur-md">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
+
         {/* Logo */}
         <Link
           href="/"
-          className="text-xl font-bold tracking-tight hover:opacity-80 transition-opacity"
+          className="group flex items-center gap-1 text-base leading-none transition-opacity hover:opacity-80"
+          style={{ fontFamily: "var(--font-bitcount), monospace" }}
         >
-          My Supa Store
+          <span>My Supa Store</span>
+          <span
+            className="inline-block h-1.5 w-1.5 rounded-full bg-accent transition-transform duration-300 group-hover:scale-150"
+            aria-hidden
+          />
         </Link>
 
         {/* Nav links */}
-        <ul className="flex items-center gap-6">
+        <ul className="hidden items-center gap-8 md:flex">
           {navLinks.map(({ href, label }) => (
             <li key={href}>
               <Link
                 href={href}
-                className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors"
+                className="font-mono text-[11px] tracking-widest text-[--muted-fg] uppercase transition-colors hover:text-foreground"
               >
                 {label}
               </Link>
@@ -35,17 +39,17 @@ export default function Navbar() {
         </ul>
 
         {/* Actions */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-5">
           <CartCount />
           <Link
             href="/admin"
-            className="text-sm font-medium text-foreground/40 hover:text-foreground transition-colors"
+            className="font-mono text-[11px] tracking-widest text-[--muted-fg] uppercase transition-colors hover:text-foreground"
           >
             Admin
           </Link>
           <Link
             href="/connexion"
-            className="rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background hover:opacity-90 transition-opacity"
+            className="rounded-none border border-foreground/20 px-4 py-1.5 font-mono text-[11px] tracking-widest uppercase transition-all hover:border-accent hover:text-accent"
           >
             Connexion
           </Link>

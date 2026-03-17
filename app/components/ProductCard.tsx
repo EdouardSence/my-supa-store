@@ -7,8 +7,7 @@ type ProductCardProps = {
 };
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const { name, slug, price, currency, stock, category, brand, images } =
-    product;
+  const { name, slug, price, currency, stock, category, brand, images } = product;
 
   const inStock = stock > 0;
   const lowStock = stock > 0 && stock <= 10;
@@ -16,53 +15,58 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <Link
       href={`/produits/${slug}`}
-      className="group flex flex-col overflow-hidden rounded-xl border border-foreground/10 bg-background transition-shadow hover:shadow-lg"
+      className="group relative block overflow-hidden bg-[--card-bg]"
+      style={{ border: "1px solid var(--border-color)" }}
     >
-      {/* Image */}
-      <div className="relative aspect-square overflow-hidden bg-foreground/5">
+      {/* Portrait image — 4:5 ratio */}
+      <div className="relative aspect-[4/5] overflow-hidden">
         <Image
           src={images.main}
           alt={name}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
         />
+
+        {/* Gradient scrim — always present, intensifies on hover */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent transition-opacity duration-300 group-hover:opacity-100" />
+
+        {/* Category — top left */}
+        <span className="absolute left-3 top-3 font-mono text-[9px] tracking-[0.15em] uppercase text-white/50">
+          {category}
+        </span>
 
         {/* Stock badge */}
         {!inStock && (
-          <span className="absolute left-3 top-3 rounded-full bg-foreground/80 px-2.5 py-1 text-xs font-medium text-background">
-            Rupture de stock
+          <span className="absolute right-3 top-3 bg-foreground/80 px-2 py-0.5 font-mono text-[9px] tracking-wider uppercase text-background">
+            Rupture
           </span>
         )}
         {lowStock && (
-          <span className="absolute left-3 top-3 rounded-full bg-amber-500 px-2.5 py-1 text-xs font-medium text-white">
-            Plus que {stock}
+          <span className="absolute right-3 top-3 bg-accent px-2 py-0.5 font-mono text-[9px] tracking-wider uppercase text-accent-fg">
+            {stock} restants
           </span>
         )}
-      </div>
 
-      {/* Content */}
-      <div className="flex flex-1 flex-col gap-2 p-4">
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <p className="text-xs text-foreground/50">
-              {brand} · {category}
-            </p>
-            <h2 className="mt-0.5 text-sm font-semibold leading-snug">{name}</h2>
+        {/* Info overlay — bottom */}
+        <div className="absolute inset-x-0 bottom-0 p-4">
+          <p className="font-mono text-[10px] tracking-widest text-white/40 uppercase">{brand}</p>
+          <h2 className="mt-1 text-sm font-semibold leading-snug text-white"
+            style={{ fontFamily: "var(--font-bitcount), monospace" }}>
+            {name}
+          </h2>
+          <div className="mt-3 flex items-center justify-between">
+            <span className="font-mono text-sm font-bold text-white">
+              {formatPrice(price, currency)}
+            </span>
+            {/* Arrow — appears on hover */}
+            <span
+              className="flex h-7 w-7 items-center justify-center border border-white/20 text-xs text-white/0 transition-all duration-300 group-hover:border-accent group-hover:text-accent"
+              aria-hidden
+            >
+              →
+            </span>
           </div>
-        </div>
-
-        <div className="mt-auto flex items-center justify-between pt-2">
-          <span className="text-base font-bold">
-            {formatPrice(price, currency)}
-          </span>
-          <span
-            className={`text-xs font-medium ${
-              inStock ? "text-green-600 dark:text-green-400" : "text-foreground/40"
-            }`}
-          >
-            {inStock ? "En stock" : "Indisponible"}
-          </span>
         </div>
       </div>
     </Link>

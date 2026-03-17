@@ -33,7 +33,10 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-foreground/10 bg-background">
+    <footer
+      className="border-t"
+      style={{ borderColor: "var(--border-color)", background: "var(--background)" }}
+    >
       <div className="mx-auto max-w-7xl px-6 py-12">
         {/* Top section */}
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
@@ -41,11 +44,19 @@ export default function Footer() {
           <div className="col-span-2 md:col-span-1">
             <Link
               href="/"
-              className="text-lg font-bold tracking-tight hover:opacity-80 transition-opacity"
+              className="inline-block font-mono text-xs font-bold tracking-[0.2em] uppercase transition-opacity hover:opacity-70"
             >
               My Supa Store
             </Link>
-            <p className="mt-3 text-sm text-foreground/60 leading-relaxed">
+            <div
+              className="mt-3 h-px w-8"
+              style={{ background: "var(--accent)" }}
+              aria-hidden
+            />
+            <p
+              className="mt-3 text-xs leading-relaxed"
+              style={{ color: "var(--muted-fg)" }}
+            >
               La boutique en ligne pour tous vos besoins.
             </p>
           </div>
@@ -53,13 +64,19 @@ export default function Footer() {
           {/* Link sections */}
           {footerSections.map((section) => (
             <div key={section.title}>
-              <h3 className="text-sm font-semibold">{section.title}</h3>
-              <ul className="mt-3 space-y-2">
+              <h3
+                className="mb-4 font-mono text-[9px] tracking-[0.25em] uppercase"
+                style={{ color: "var(--accent)" }}
+              >
+                {section.title}
+              </h3>
+              <ul className="space-y-2.5">
                 {section.links.map(({ href, label }) => (
                   <li key={href}>
                     <Link
                       href={href}
-                      className="text-sm text-foreground/60 hover:text-foreground transition-colors"
+                      className="text-xs transition-colors hover:text-foreground"
+                      style={{ color: "var(--muted-fg)" }}
                     >
                       {label}
                     </Link>
@@ -71,8 +88,22 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-10 border-t border-foreground/10 pt-6 text-center text-sm text-foreground/50">
-          &copy; {currentYear} My Supa Store. Tous droits réservés.
+        <div
+          className="mt-10 flex flex-col items-center justify-between gap-3 border-t pt-6 sm:flex-row"
+          style={{ borderColor: "var(--border-color)" }}
+        >
+          <p
+            className="font-mono text-[9px] tracking-[0.2em] uppercase"
+            style={{ color: "var(--muted-fg)" }}
+          >
+            &copy; {currentYear} My Supa Store
+          </p>
+          <p
+            className="font-mono text-[9px] tracking-[0.15em] uppercase"
+            style={{ color: "var(--muted-fg)" }}
+          >
+            Tous droits réservés
+          </p>
         </div>
       </div>
     </footer>
