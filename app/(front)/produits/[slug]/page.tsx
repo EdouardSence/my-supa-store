@@ -8,8 +8,11 @@ import AddToCartButton from "@/app/components/AddToCartButton";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
+type Tab = "description" | "specs";
+
 type PageProps = {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ tab?: string }>;
 };
 
 // ─── Static params ────────────────────────────────────────────────────────────
@@ -35,8 +38,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default async function ProductPage({ params }: PageProps) {
+export default async function ProductPage({ params, searchParams }: PageProps) {
   const { slug } = await params;
+  const { tab: rawTab } = await searchParams;
+  const tab: Tab = rawTab === "specs" ? "specs" : "description";
+
   const product = await getProductBySlug(slug);
 
   if (!product) notFound();
@@ -174,44 +180,77 @@ export default async function ProductPage({ params }: PageProps) {
             </span>
           </div>
 
-          {/* Description */}
-          <p
-            className="text-sm leading-relaxed"
-            style={{ color: "var(--muted-fg)" }}
-          >
-            {description}
-          </p>
-
           {/* CTA */}
           <AddToCartButton product={product} inStock={inStock} />
 
-          {/* Specs */}
+          {/* ── Tabs ── */}
           <div className="border-t pt-8" style={{ borderColor: "var(--border-color)" }}>
-            <p
-              className="mb-4 font-mono text-[9px] tracking-[0.25em] uppercase"
-              style={{ color: "var(--accent)" }}
+            {/* Tab bar */}
+            <div
+              className="flex border-b"
+              style={{ borderColor: "var(--border-color)" }}
+              role="tablist"
             >
-              Caractéristiques
-            </p>
-            <dl>
-              {Object.entries(specs).map(([key, value]) => (
-                <div
-                  key={key}
-                  className="flex items-baseline justify-between border-b py-2.5 last:border-0"
-                  style={{ borderColor: "var(--border-color)" }}
-                >
-                  <dt
-                    className="font-mono text-[10px] tracking-widest capitalize"
-                    style={{ color: "var(--muted-fg)" }}
+              {(
+                [
+                  { id: "description", label: "Description" },
+                  { id: "specs",       label: "Spécifications" },
+                ] as { id: Tab; label: string }[]
+              ).map(({ id, label }) => {
+                const active = tab === id;
+                return (
+                  <Link
+                    key={id}
+                    href={`?tab=${id}`}
+                    role="tab"
+                    aria-selected={active}
+                    className="relative mr-6 pb-3 font-mono text-[9px] tracking-[0.2em] uppercase transition-colors"
+                    style={{ color: active ? "var(--foreground)" : "var(--muted-fg)" }}
                   >
-                    {key.replace(/([A-Z])/g, " $1")}
-                  </dt>
-                  <dd className="text-sm font-medium">
-                    {typeof value === "boolean" ? (value ? "Oui" : "Non") : String(value)}
-                  </dd>
-                </div>
-              ))}
-            </dl>
+                    {label}
+                    {active && (
+                      <span
+                        className="absolute inset-x-0 -bottom-px h-px"
+                        style={{ background: "var(--accent)" }}
+                        aria-hidden
+                      />
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Tab panel */}
+            <div className="pt-6" role="tabpanel">
+              {tab === "description" ? (
+                <p
+                  className="text-sm leading-relaxed"
+                  style={{ color: "var(--muted-fg)" }}
+                >
+                  {description}
+                </p>
+              ) : (
+                <dl>
+                  {Object.entries(specs).map(([key, value]) => (
+                    <div
+                      key={key}
+                      className="flex items-baseline justify-between border-b py-2.5 last:border-0"
+                      style={{ borderColor: "var(--border-color)" }}
+                    >
+                      <dt
+                        className="font-mono text-[10px] tracking-widest capitalize"
+                        style={{ color: "var(--muted-fg)" }}
+                      >
+                        {key.replace(/([A-Z])/g, " $1")}
+                      </dt>
+                      <dd className="text-sm font-medium">
+                        {typeof value === "boolean" ? (value ? "Oui" : "Non") : String(value)}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
+            </div>
           </div>
         </div>
       </div>
