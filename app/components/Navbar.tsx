@@ -38,6 +38,12 @@ export default function Navbar() {
         <div className="flex items-center gap-4">
           <CartCount />
           <Link
+            href="/admin"
+            className="text-sm font-medium text-foreground/40 hover:text-foreground transition-colors"
+          >
+            Admin
+          </Link>
+          <Link
             href="/connexion"
             className="rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background hover:opacity-90 transition-opacity"
           >
