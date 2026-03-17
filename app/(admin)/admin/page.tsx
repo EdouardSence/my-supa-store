@@ -1,6 +1,9 @@
 import Link from "next/link";
+import { getProductCount } from "@/lib/queries";
 
-export default function AdminDashboard() {
+export default async function AdminDashboard() {
+    const productCount = await getProductCount();
+
     return (
         <div>
             <h1 className="text-2xl font-semibold text-white">Dashboard</h1>
@@ -8,7 +11,7 @@ export default function AdminDashboard() {
                 Bienvenue dans l&apos;espace d&apos;administration.
             </p>
             <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {[{ label: "Produits", value: "—", href: "/admin/produits" }].map((card) => (
+                {[{ label: "Produits", value: productCount, href: "/admin/produits" }].map((card) => (
                     <Link
                         key={card.label}
                         href={card.href}

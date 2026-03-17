@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:push": "prisma db push"
   },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^7.5.0",

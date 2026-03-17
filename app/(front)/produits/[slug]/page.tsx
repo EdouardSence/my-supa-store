@@ -2,7 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { products, getProductBySlug, formatPrice } from "@/lib/products";
+import { getAllProducts, getProductBySlug } from "@/lib/queries";
+import { formatPrice } from "@/lib/products";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -12,7 +13,8 @@ type PageProps = {
 
 // ─── Static params ────────────────────────────────────────────────────────────
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const products = await getAllProducts();
   return products.map((p) => ({ slug: p.slug }));
 }
 
@@ -20,7 +22,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlug(slug);
 
   if (!product) return { title: "Produit introuvable" };
 
@@ -34,7 +36,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ProductPage({ params }: PageProps) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlug(slug);
 
   if (!product) notFound();
 
