@@ -1,4 +1,5 @@
 import Link from "next/link";
+import CartCount from "./CartCount";
 
 const navLinks = [
   { href: "/", label: "Accueil" },
@@ -35,13 +36,7 @@ export default function Navbar() {
 
         {/* Actions */}
         <div className="flex items-center gap-4">
-          <Link
-            href="/panier"
-            className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors"
-            aria-label="Panier"
-          >
-            Panier
-          </Link>
+          <CartCount />
           <Link
             href="/connexion"
             className="rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background hover:opacity-90 transition-opacity"

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getAllProducts, getProductBySlug } from "@/lib/queries";
 import { formatPrice } from "@/lib/products";
+import AddToCartButton from "@/app/components/AddToCartButton";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -130,12 +131,7 @@ export default async function ProductPage({ params }: PageProps) {
           <p className="leading-relaxed text-foreground/70">{description}</p>
 
           {/* CTA */}
-          <button
-            disabled={!inStock}
-            className="w-full rounded-xl bg-foreground px-6 py-3.5 text-sm font-semibold text-background transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            {inStock ? "Ajouter au panier" : "Indisponible"}
-          </button>
+          <AddToCartButton product={product} inStock={inStock} />
 
           {/* Specs */}
           <div className="rounded-xl border border-foreground/10 p-5">
