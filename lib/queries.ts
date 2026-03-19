@@ -12,6 +12,10 @@ function toProducts(
   return raws as unknown as Product[];
 }
 
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export async function getAllProducts(): Promise<Product[]> {
   const rows = await prisma.product.findMany({
     orderBy: { createdAt: "asc" },
@@ -20,6 +24,7 @@ export async function getAllProducts(): Promise<Product[]> {
 }
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {
+  await delay(200);
   const row = await prisma.product.findUnique({ where: { slug } });
   return toProduct(row);
 }
@@ -29,6 +34,7 @@ export async function getProductCount(): Promise<number> {
 }
 
 export async function getSimilarProducts(productId: string): Promise<Product[]> {
+  await delay(1500);
   const rows = await prisma.similarProduct.findMany({
     where: { productId },
     orderBy: { score: "asc" },
