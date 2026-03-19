@@ -1,18 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getAllProducts, getProductBySlug } from "@/lib/queries";
 import { formatPrice } from "@/lib/products";
 import AddToCartButton from "@/app/components/AddToCartButton";
+import ProductTabs from "@/app/components/ProductTabs";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type Tab = "description" | "specs";
-
 type PageProps = {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ tab?: string }>;
 };
 
 // ─── Static params ────────────────────────────────────────────────────────────
@@ -38,10 +37,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default async function ProductPage({ params, searchParams }: PageProps) {
+export default async function ProductPage({ params }: PageProps) {
   const { slug } = await params;
-  const { tab: rawTab } = await searchParams;
-  const tab: Tab = rawTab === "specs" ? "specs" : "description";
 
   const product = await getProductBySlug(slug);
 
@@ -184,74 +181,9 @@ export default async function ProductPage({ params, searchParams }: PageProps) {
           <AddToCartButton product={product} inStock={inStock} />
 
           {/* ── Tabs ── */}
-          <div className="border-t pt-8" style={{ borderColor: "var(--border-color)" }}>
-            {/* Tab bar */}
-            <div
-              className="flex border-b"
-              style={{ borderColor: "var(--border-color)" }}
-              role="tablist"
-            >
-              {(
-                [
-                  { id: "description", label: "Description" },
-                  { id: "specs",       label: "Spécifications" },
-                ] as { id: Tab; label: string }[]
-              ).map(({ id, label }) => {
-                const active = tab === id;
-                return (
-                  <Link
-                    key={id}
-                    href={`?tab=${id}`}
-                    role="tab"
-                    aria-selected={active}
-                    className="relative mr-6 pb-3 font-mono text-[9px] tracking-[0.2em] uppercase transition-colors"
-                    style={{ color: active ? "var(--foreground)" : "var(--muted-fg)" }}
-                  >
-                    {label}
-                    {active && (
-                      <span
-                        className="absolute inset-x-0 -bottom-px h-px"
-                        style={{ background: "var(--accent)" }}
-                        aria-hidden
-                      />
-                    )}
-                  </Link>
-                );
-              })}
-            </div>
-
-            {/* Tab panel */}
-            <div className="pt-6" role="tabpanel">
-              {tab === "description" ? (
-                <p
-                  className="text-sm leading-relaxed"
-                  style={{ color: "var(--muted-fg)" }}
-                >
-                  {description}
-                </p>
-              ) : (
-                <dl>
-                  {Object.entries(specs).map(([key, value]) => (
-                    <div
-                      key={key}
-                      className="flex items-baseline justify-between border-b py-2.5 last:border-0"
-                      style={{ borderColor: "var(--border-color)" }}
-                    >
-                      <dt
-                        className="font-mono text-[10px] tracking-widest capitalize"
-                        style={{ color: "var(--muted-fg)" }}
-                      >
-                        {key.replace(/([A-Z])/g, " $1")}
-                      </dt>
-                      <dd className="text-sm font-medium">
-                        {typeof value === "boolean" ? (value ? "Oui" : "Non") : String(value)}
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
-              )}
-            </div>
-          </div>
+          <Suspense fallback={<div className="border-t pt-8 h-48" style={{ borderColor: "var(--border-color)" }} />}>
+            <ProductTabs description={description} specs={specs} />
+          </Suspense>
         </div>
       </div>
     </div>
