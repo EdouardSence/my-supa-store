@@ -3,13 +3,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { getProductBySlug } from "@/lib/queries";
+import { getProductBySlug, getAllProducts, getSimilarProducts } from "@/lib/queries";
 import { formatPrice } from "@/lib/products";
 import AddToCartButton from "@/app/components/AddToCartButton";
 import ProductTabs from "@/app/components/ProductTabs";
 import ProductInfoSkeleton from "@/app/components/ProductInfoSkeleton";
-
-export const dynamic = "force-dynamic";
+import SimilarProducts from "@/app/components/SimilarProducts";
+import SimilarProductsSkeleton from "@/app/components/SimilarProductsSkeleton";
+import SponsoredProductsSection from "@/app/components/SponsoredProductsSection";
+import SponsoredProductsSkeleton from "@/app/components/SponsoredProductsSkeleton";
+import { getSponsoredProducts } from "@/lib/graphql/client";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -25,6 +28,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title: `${product.name} — My Supa Store`,
     description: product.description,
   };
+}
+
+export async function generateStaticParams() {
+  const products = await getAllProducts();
+  return products.map((product) => ({
+    slug: product.slug,
+  }));
 }
 
 async function ProductInfo({ slug }: { slug: string }) {
@@ -85,6 +95,18 @@ async function ProductInfo({ slug }: { slug: string }) {
       </Suspense>
     </div>
   );
+}
+
+async function SimilarSection({ productId }: { productId: string }) {
+  const similar = await getSimilarProducts(productId);
+  if (similar.length === 0) return null;
+  return <SimilarProducts products={similar} />;
+}
+
+async function SponsoredSection() {
+  const sponsored = await getSponsoredProducts();
+  if (sponsored.length === 0) return null;
+  return <SponsoredProductsSection products={sponsored} />;
 }
 
 export default async function ProductPage({ params }: PageProps) {
@@ -162,6 +184,14 @@ export default async function ProductPage({ params }: PageProps) {
           <ProductInfo slug={slug} />
         </Suspense>
       </div>
+
+      <Suspense fallback={<SimilarProductsSkeleton />}>
+        <SimilarSection productId={product.id} />
+      </Suspense>
+
+      <Suspense fallback={<SponsoredProductsSkeleton />}>
+        <SponsoredSection />
+      </Suspense>
     </div>
   );
 }

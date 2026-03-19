@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import type { Product } from "@/lib/products";
+import { cache } from "react";
 
 function toProduct(raw: Awaited<ReturnType<typeof prisma.product.findFirst>>): Product | null {
   if (!raw) return null;
@@ -33,7 +34,7 @@ export async function getProductCount(): Promise<number> {
   return prisma.product.count();
 }
 
-export async function getSimilarProducts(productId: string): Promise<Product[]> {
+export const getSimilarProducts = cache(async (productId: string): Promise<Product[]> => {
   await delay(1500);
   const rows = await prisma.similarProduct.findMany({
     where: { productId },
@@ -44,4 +45,4 @@ export async function getSimilarProducts(productId: string): Promise<Product[]> 
     },
   });
   return toProducts(rows.map((r: { similarProduct: unknown }) => r.similarProduct));
-}
+});
