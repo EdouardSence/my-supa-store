@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getAllProducts } from "@/lib/queries";
 import { getSponsoredProducts } from "@/lib/graphql/client";
 import ProductCard from "@/app/components/ProductCard";
-import SponsoredProductCard from "@/app/components/SponsoredProductCard";
+import SponsoredProductsSection from "@/app/components/SponsoredProductsSection";
 
 export default async function HomePage() {
   const [products, sponsoredProducts] = await Promise.all([
@@ -81,43 +81,7 @@ export default async function HomePage() {
 
       {/* ── Sponsored products ── */}
       {sponsoredProducts.length > 0 && (
-        <section className="mx-auto max-w-7xl px-6 py-16">
-          <div className="mb-10 flex items-end justify-between border-b pb-4" style={{ borderColor: "var(--border-color)" }}>
-            <div>
-              <p className="mb-1 font-mono text-[9px] tracking-[0.2em] uppercase" style={{ color: "var(--accent)" }}>
-                Partenaires
-              </p>
-              <h2
-                className="text-2xl font-bold tracking-tight"
-                style={{ fontFamily: "var(--font-bitcount), monospace" }}
-              >
-                Produits sponsorisés
-              </h2>
-            </div>
-            <Link
-              href="/sponsored"
-              className="font-mono text-[10px] tracking-widest uppercase transition-colors hover:text-foreground"
-              style={{ color: "var(--muted-fg)" }}
-            >
-              Voir tout →
-            </Link>
-          </div>
-
-          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {sponsoredProducts.slice(0, 4).map((product, i: number) => (
-              <li
-                key={product.id}
-                style={{
-                  animation: `slide-up 0.5s ${i * 0.08}s ease both`,
-                  opacity: 0,
-                  animationFillMode: "forwards",
-                }}
-              >
-                <SponsoredProductCard product={product} />
-              </li>
-            ))}
-          </ul>
-        </section>
+        <SponsoredProductsSection products={sponsoredProducts} />
       )}
 
       {/* ── Featured products ── */}

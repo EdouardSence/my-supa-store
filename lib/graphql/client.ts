@@ -66,10 +66,14 @@ const PRODUCT_QUERY = `
   }
 `;
 
+export const SPONSORED_PRODUCTS_TAG = "sponsored-products";
+
 async function fetchGraphQL<T>(
   query: string,
-  variables?: Record<string, unknown>
+  variables?: Record<string, unknown>,
+  options?: RequestInit & { next?: { revalidate?: number | false; tags?: string[] } }
 ): Promise<T> {
+  const start = performance.now();
   try {
     const response = await fetch(MOCK_SHOPIFY_URL, {
       method: "POST",
@@ -77,21 +81,25 @@ async function fetchGraphQL<T>(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ query, variables }),
+      ...options,
     });
+    console.log(`[mockShop] fetch products ${(performance.now() - start).toFixed(0)}ms (revalidate: ${options?.next?.revalidate ?? 'default'})`);
 
     if (!response.ok) {
-      throw new Error(`GraphQL request failed: ${response.status}`);
+      console.warn(`[mockShop] request failed: ${response.status}, using mock data`);
+      return getMockData<T>();
     }
 
     const json = await response.json();
 
     if (json.errors) {
-      throw new Error(json.errors[0].message);
+      console.warn(`[mockShop] GraphQL error: ${json.errors[0].message}, using mock data`);
+      return getMockData<T>();
     }
 
     return json.data as T;
   } catch (error) {
-    console.warn("GraphQL fetch failed, using mock data:", error);
+    console.warn("[mockShop] fetch failed, using mock data:", error);
     return getMockData<T>();
   }
 }
@@ -208,7 +216,8 @@ function getMockData<T>(): T {
 export async function getSponsoredProducts(): Promise<SponsoredProduct[]> {
   const data = await fetchGraphQL<CollectionWithProductsResponse>(
     COLLECTION_QUERY,
-    { handle: "collection-with-products" }
+    { handle: "collection-with-products" },
+    { next: { revalidate: 3600, tags: [SPONSORED_PRODUCTS_TAG] } }
   );
 
   return data.collection?.products.edges.map((edge) => edge.node) ?? [];
