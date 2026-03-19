@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import type {
   CollectionWithProductsResponse,
   SponsoredProduct,
@@ -213,7 +214,7 @@ function getMockData<T>(): T {
   return { collection: mockCollection } as T;
 }
 
-export async function getSponsoredProducts(): Promise<SponsoredProduct[]> {
+async function fetchSponsoredProducts(): Promise<SponsoredProduct[]> {
   const data = await fetchGraphQL<CollectionWithProductsResponse>(
     COLLECTION_QUERY,
     { handle: "collection-with-products" },
@@ -222,6 +223,12 @@ export async function getSponsoredProducts(): Promise<SponsoredProduct[]> {
 
   return data.collection?.products.edges.map((edge) => edge.node) ?? [];
 }
+
+export const getSponsoredProducts = unstable_cache(
+  fetchSponsoredProducts,
+  ["sponsored-products"],
+  { revalidate: 3600, tags: [SPONSORED_PRODUCTS_TAG] }
+);
 
 export async function getSponsoredProductByHandle(
   handle: string
