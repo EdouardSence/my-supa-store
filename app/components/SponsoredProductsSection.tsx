@@ -4,27 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import SponsoredProductCard from "./SponsoredProductCard";
-
-type SponsoredProduct = {
-  id: string;
-  title: string;
-  handle: string;
-  availableForSale: boolean;
-  priceRange: {
-    minVariantPrice: {
-      amount: string;
-      currencyCode: string;
-    };
-  };
-  images: {
-    edges: {
-      node: {
-        url: string;
-        altText: string | null;
-      };
-    }[];
-  };
-};
+import type { SponsoredProduct } from "@/domains/catalog/entity/sponsoredProduct";
 
 export default function SponsoredProductsSection({
   products,

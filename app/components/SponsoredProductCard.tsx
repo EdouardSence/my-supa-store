@@ -1,22 +1,19 @@
 import Link from "next/link";
 import Image from "next/image";
-import type { SponsoredProduct } from "@/lib/graphql/types";
+import type { SponsoredProduct } from "@/domains/catalog/entity/sponsoredProduct";
 
 type Props = {
   product: SponsoredProduct;
 };
 
-function formatPrice(amount: string, currencyCode: string): string {
+function formatPrice(amount: number, currencyCode: string): string {
   return new Intl.NumberFormat("fr-FR", {
     style: "currency",
     currency: currencyCode,
-  }).format(parseFloat(amount));
+  }).format(amount);
 }
 
 export default function SponsoredProductCard({ product }: Props) {
-  const image = product.images.edges[0]?.node;
-  const price = product.priceRange.minVariantPrice;
-
   return (
     <Link
       href={`/sponsored/${product.handle}`}
@@ -27,10 +24,10 @@ export default function SponsoredProductCard({ product }: Props) {
       }}
     >
       <div className="relative aspect-[4/5] overflow-hidden">
-        {image && (
+        {product.imageUrl && (
           <Image
-            src={image.url}
-            alt={image.altText ?? product.title}
+            src={product.imageUrl}
+            alt={product.name}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
             className="object-cover transition-transform group-hover:scale-105"
@@ -51,13 +48,13 @@ export default function SponsoredProductCard({ product }: Props) {
           className="text-sm font-medium leading-tight line-clamp-2"
           style={{ fontFamily: "var(--font-bitcount), monospace" }}
         >
-          {product.title}
+          {product.name}
         </h3>
         <p
           className="mt-2 font-mono text-sm font-bold"
           style={{ color: "var(--accent)" }}
         >
-          {formatPrice(price.amount, price.currencyCode)}
+          {formatPrice(product.price, product.currency)}
         </p>
       </div>
     </Link>

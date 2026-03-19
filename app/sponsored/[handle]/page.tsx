@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getSponsoredProductByHandle, getSponsoredProducts } from "@/lib/graphql/client";
-import type { SponsoredProduct } from "@/lib/graphql/types";
+import type { SponsoredProduct } from "@/domains/catalog/entity/sponsoredProduct";
 
 type Props = {
   params: Promise<{ handle: string }>;
@@ -21,16 +21,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!product) return { title: "Produit introuvable" };
 
   return {
-    title: `${product.title} — My Supa Store`,
-    description: `Produit sponsorisé: ${product.title}`,
+    title: `${product.name} — My Supa Store`,
+    description: `Produit sponsorisé: ${product.name}`,
   };
 }
 
-function formatPrice(amount: string, currencyCode: string): string {
+function formatPrice(amount: number, currencyCode: string): string {
   return new Intl.NumberFormat("fr-FR", {
     style: "currency",
     currency: currencyCode,
-  }).format(parseFloat(amount));
+  }).format(amount);
 }
 
 export default async function SponsoredProductPage({ params }: Props) {
@@ -38,8 +38,6 @@ export default async function SponsoredProductPage({ params }: Props) {
   const product = await getSponsoredProductByHandle(handle);
 
   if (!product) notFound();
-
-  const price = product.priceRange.minVariantPrice;
 
   return (
     <div className="mx-auto max-w-7xl px-6 pb-20">
@@ -54,7 +52,7 @@ export default async function SponsoredProductPage({ params }: Props) {
         <span style={{ color: "var(--border-color)" }}>╱</span>
         <span style={{ color: "var(--accent)" }}>Sponsorisé</span>
         <span style={{ color: "var(--border-color)" }}>╱</span>
-        <span className="text-foreground">{product.title}</span>
+        <span className="text-foreground">{product.name}</span>
       </nav>
 
       <div className="grid grid-cols-1 gap-0 lg:grid-cols-[1fr_1px_1fr]">
@@ -66,10 +64,10 @@ export default async function SponsoredProductPage({ params }: Props) {
               border: "1px solid var(--border-color)",
             }}
           >
-            {product.images.edges[0]?.node && (
+            {product.imageUrl && (
               <Image
-                src={product.images.edges[0].node.url}
-                alt={product.images.edges[0].node.altText ?? product.title}
+                src={product.imageUrl}
+                alt={product.name}
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover"
@@ -86,26 +84,6 @@ export default async function SponsoredProductPage({ params }: Props) {
               Sponsorisé
             </span>
           </div>
-
-          {product.images.edges.length > 1 && (
-            <ul className="flex gap-2">
-              {product.images.edges.map((edge, i) => (
-                <li
-                  key={i}
-                  className="relative h-16 w-16 flex-shrink-0 overflow-hidden"
-                  style={{ border: "1px solid var(--border-color)" }}
-                >
-                  <Image
-                    src={edge.node.url}
-                    alt={edge.node.altText ?? `Vue ${i + 1}`}
-                    fill
-                    sizes="64px"
-                    className="object-cover"
-                  />
-                </li>
-              ))}
-            </ul>
-          )}
         </div>
 
         <div
@@ -133,7 +111,7 @@ export default async function SponsoredProductPage({ params }: Props) {
               className="text-[clamp(1.8rem,4vw,3rem)] font-bold leading-tight tracking-tight"
               style={{ fontFamily: "var(--font-bitcount), monospace" }}
             >
-              {product.title}
+              {product.name}
             </h1>
           </div>
 
@@ -144,22 +122,16 @@ export default async function SponsoredProductPage({ params }: Props) {
             <span
               className="text-[clamp(2rem,5vw,3.5rem)] font-extrabold leading-none tracking-tight"
             >
-              {formatPrice(price.amount, price.currencyCode)}
+              {formatPrice(product.price, product.currency)}
             </span>
             <span
               className="font-mono text-[9px] tracking-[0.2em] uppercase px-3 py-1.5"
               style={{
-                color: product.availableForSale
-                  ? "var(--accent)"
-                  : "var(--muted-fg)",
-                border: `1px solid ${
-                  product.availableForSale
-                    ? "var(--accent)"
-                    : "var(--border-color)"
-                }`,
+                color: "var(--accent)",
+                border: "1px solid var(--accent)",
               }}
             >
-              {product.availableForSale ? "En stock" : "Rupture"}
+              En stock
             </span>
           </div>
 
@@ -183,14 +155,16 @@ export default async function SponsoredProductPage({ params }: Props) {
           </div>
 
           <Link
-            href="/"
+            href={product.url}
+            target="_blank"
+            rel="noopener noreferrer"
             className="w-full rounded-xl px-6 py-3.5 text-center text-sm font-semibold transition-opacity hover:opacity-90"
             style={{
-              background: "var(--muted-fg)",
-              color: "var(--background)",
+              background: "var(--accent)",
+              color: "var(--accent-fg)",
             }}
           >
-            Découvrir plus de produits
+            Voir sur Mock.shop →
           </Link>
         </div>
       </div>
