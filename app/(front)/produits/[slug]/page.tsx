@@ -3,15 +3,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { getProductBySlug, getSimilarProducts } from "@/lib/queries";
+import { getProductBySlug } from "@/lib/queries";
 import { formatPrice } from "@/lib/products";
-import { getSponsoredProducts } from "@/lib/graphql/client";
 import AddToCartButton from "@/app/components/AddToCartButton";
 import ProductTabs from "@/app/components/ProductTabs";
-import SimilarProducts from "@/app/components/SimilarProducts";
-import SimilarProductsSkeleton from "@/app/components/SimilarProductsSkeleton";
 import ProductInfoSkeleton from "@/app/components/ProductInfoSkeleton";
-import SponsoredProductCard from "@/app/components/SponsoredProductCard";
 
 export const dynamic = "force-dynamic";
 
@@ -91,39 +87,6 @@ async function ProductInfo({ slug }: { slug: string }) {
   );
 }
 
-async function SimilarProductsSection({ productId }: { productId: string }) {
-  const similar = await getSimilarProducts(productId);
-  if (similar.length === 0) return null;
-  return <SimilarProducts products={similar} />;
-}
-
-async function SponsoredSection() {
-  const sponsored = await getSponsoredProducts();
-  if (sponsored.length === 0) return null;
-  return (
-    <section className="mt-20 border-t pt-16" style={{ borderColor: "var(--border-color)" }}>
-      <div className="mb-10">
-        <p className="mb-1 font-mono text-[9px] tracking-[0.2em] uppercase" style={{ color: "var(--accent)" }}>
-          Partenaires
-        </p>
-        <h2
-          className="text-2xl font-bold tracking-tight"
-          style={{ fontFamily: "var(--font-bitcount), monospace" }}
-        >
-          Produits sponsorisés
-        </h2>
-      </div>
-      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {sponsored.slice(0, 4).map((product) => (
-          <li key={product.id}>
-            <SponsoredProductCard product={product} />
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
-
 export default async function ProductPage({ params }: PageProps) {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
@@ -199,12 +162,6 @@ export default async function ProductPage({ params }: PageProps) {
           <ProductInfo slug={slug} />
         </Suspense>
       </div>
-
-      <Suspense fallback={<SimilarProductsSkeleton />}>
-        <SimilarProductsSection productId={product.id} />
-      </Suspense>
-
-      <SponsoredSection />
     </div>
   );
 }

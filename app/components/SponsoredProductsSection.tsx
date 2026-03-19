@@ -40,7 +40,7 @@ export default function SponsoredProductsSection({
     await fetch("/api/revalidate", { method: "POST" });
     startTransition(() => {
       router.refresh();
-      setTimeout(() => setRevalidating(false), 800);
+      setTimeout(() => setRevalidating(false), 100);
     });
   }
 
