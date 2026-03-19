@@ -8,6 +8,10 @@ import { formatPrice } from "@/lib/products";
 import AddToCartButton from "@/app/components/AddToCartButton";
 import ProductTabs from "@/app/components/ProductTabs";
 
+// ─── ISR: revalidate every 60 seconds ───────────────────────────────────────
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const revalidate = 60;
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type PageProps = {
