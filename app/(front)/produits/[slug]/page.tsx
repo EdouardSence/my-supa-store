@@ -3,10 +3,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { getAllProducts, getProductBySlug } from "@/lib/queries";
+import { getAllProducts, getProductBySlug, getSimilarProducts } from "@/lib/queries";
 import { formatPrice } from "@/lib/products";
 import AddToCartButton from "@/app/components/AddToCartButton";
 import ProductTabs from "@/app/components/ProductTabs";
+import ProductCard from "@/app/components/ProductCard";
 
 // ─── Dynamic: force server render on every request ───────────────────────────
 export const dynamic = "force-dynamic";
@@ -40,11 +41,13 @@ export default async function ProductPage({ params }: PageProps) {
 
   if (!product) notFound();
 
-  const { name, description, price, currency, stock, category, brand, images, specs, sku } =
+  const { name, description, price, currency, stock, category, brand, images, specs, sku, id } =
     product;
 
   const inStock = stock > 0;
   const lowStock = stock > 0 && stock <= 10;
+
+  const similar = await getSimilarProducts(id);
 
   return (
     <div className="mx-auto max-w-7xl px-6 pb-20">
@@ -174,7 +177,7 @@ export default async function ProductPage({ params }: PageProps) {
           </div>
 
           {/* CTA */}
-          <AddToCartButton product={product} inStock={inStock} />
+          <AddToCartButton productId={product.id} inStock={inStock} />
 
           {/* ── Tabs ── */}
           <Suspense fallback={<div className="border-t pt-8 h-48" style={{ borderColor: "var(--border-color)" }} />}>
@@ -182,6 +185,39 @@ export default async function ProductPage({ params }: PageProps) {
           </Suspense>
         </div>
       </div>
+
+      {/* ── Similar products ── */}
+      {similar.length > 0 && (
+        <section className="mx-auto max-w-7xl px-6 py-16">
+          <div className="mb-10 flex items-end justify-between border-b pb-4" style={{ borderColor: "var(--border-color)" }}>
+            <div>
+              <p className="mb-1 font-mono text-[9px] tracking-[0.2em] uppercase" style={{ color: "var(--accent)" }}>
+                Vous aimerez aussi
+              </p>
+              <h2
+                className="text-2xl font-bold tracking-tight"
+                style={{ fontFamily: "var(--font-bitcount), monospace" }}
+              >
+                Produits similaires
+              </h2>
+            </div>
+          </div>
+          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {similar.map((p, i) => (
+              <li
+                key={p.id}
+                style={{
+                  animation: `slide-up 0.5s ${i * 0.08}s ease both`,
+                  opacity: 0,
+                  animationFillMode: "forwards",
+                }}
+              >
+                <ProductCard product={p} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </div>
   );
 }

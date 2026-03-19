@@ -1,18 +1,40 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useCart } from "@/app/context/cart";
 
 export default function CartCount() {
-  const { totalItems } = useCart();
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    async function fetchCount() {
+      try {
+        const res = await fetch("/api/cart");
+        const data = await res.json();
+        const items = data.items ?? [];
+        const total = items.reduce((sum: number, item: { quantity: number }) => sum + item.quantity, 0);
+        setCount(total);
+      } catch {
+        // ignore
+      }
+    }
+
+    fetchCount();
+
+    function handleUpdate() {
+      fetchCount();
+    }
+
+    window.addEventListener("cart-updated", handleUpdate);
+    return () => window.removeEventListener("cart-updated", handleUpdate);
+  }, []);
 
   return (
     <Link
       href="/panier"
       className="relative flex items-center gap-1.5 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors"
-      aria-label={`Panier — ${totalItems} article${totalItems !== 1 ? "s" : ""}`}
+      aria-label={`Panier — ${count} article${count !== 1 ? "s" : ""}`}
     >
-      {/* Bag icon */}
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="20"
@@ -29,13 +51,10 @@ export default function CartCount() {
         <line x1="3" y1="6" x2="21" y2="6" />
         <path d="M16 10a4 4 0 0 1-8 0" />
       </svg>
-
       <span className="hidden sm:inline">Panier</span>
-
-      {/* Badge */}
-      {totalItems > 0 && (
+      {count > 0 && (
         <span className="absolute -right-2.5 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-foreground px-1 text-[10px] font-bold leading-none text-background">
-          {totalItems > 99 ? "99+" : totalItems}
+          {count > 99 ? "99+" : count}
         </span>
       )}
     </Link>

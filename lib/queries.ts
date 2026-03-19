@@ -1,10 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import type { Product } from "@/lib/products";
 
-/**
- * Les champs `images` et `specs` sont stockés en JSON dans SQLite.
- * On les caste vers nos types applicatifs après récupération.
- */
 function toProduct(raw: Awaited<ReturnType<typeof prisma.product.findFirst>>): Product | null {
   if (!raw) return null;
   return raw as unknown as Product;
@@ -30,4 +26,16 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
 
 export async function getProductCount(): Promise<number> {
   return prisma.product.count();
+}
+
+export async function getSimilarProducts(productId: string): Promise<Product[]> {
+  const rows = await prisma.similarProduct.findMany({
+    where: { productId },
+    orderBy: { score: "asc" },
+    take: 4,
+    include: {
+      similarProduct: true,
+    },
+  });
+  return toProducts(rows.map((r: { similarProduct: unknown }) => r.similarProduct));
 }
