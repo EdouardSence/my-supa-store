@@ -1,16 +1,21 @@
 import Link from "next/link";
 import { getAllProducts } from "@/lib/queries";
+import { getSponsoredProducts } from "@/lib/graphql/client";
 import ProductCard from "@/app/components/ProductCard";
+import SponsoredProductCard from "@/app/components/SponsoredProductCard";
 
 export default async function HomePage() {
-  const products = await getAllProducts();
+  const [products, sponsoredProducts] = await Promise.all([
+    getAllProducts(),
+    getSponsoredProducts(),
+  ]);
+
   const featured = products.slice(0, 4);
 
   return (
     <div>
       {/* ── Hero ── */}
       <section className="relative overflow-hidden border-b" style={{ borderColor: "var(--border-color)" }}>
-        {/* Top rule */}
         <div
           className="absolute top-0 left-0 right-0 h-px origin-left"
           style={{ background: "var(--accent)", animation: "reveal-line 1s ease forwards" }}
@@ -19,7 +24,6 @@ export default async function HomePage() {
 
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] items-end gap-8 py-20 lg:py-32">
-            {/* Left — headline */}
             <div style={{ animation: "slide-up 0.7s ease both" }}>
               <p
                 className="mb-4 font-mono text-[10px] tracking-[0.25em] uppercase"
@@ -35,7 +39,6 @@ export default async function HomePage() {
               </h1>
             </div>
 
-            {/* Right — descriptor + CTA */}
             <div
               className="flex flex-col items-start gap-8 pb-2 lg:items-end"
               style={{ animation: "slide-up 0.7s 0.15s ease both", opacity: 0, animationFillMode: "forwards" }}
@@ -67,7 +70,6 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* Large background number */}
         <span
           aria-hidden
           className="pointer-events-none absolute right-6 top-1/2 -translate-y-1/2 select-none font-mono text-[20vw] font-bold leading-none"
@@ -77,10 +79,50 @@ export default async function HomePage() {
         </span>
       </section>
 
+      {/* ── Sponsored products ── */}
+      {sponsoredProducts.length > 0 && (
+        <section className="mx-auto max-w-7xl px-6 py-16">
+          <div className="mb-10 flex items-end justify-between border-b pb-4" style={{ borderColor: "var(--border-color)" }}>
+            <div>
+              <p className="mb-1 font-mono text-[9px] tracking-[0.2em] uppercase" style={{ color: "var(--accent)" }}>
+                Partenaires
+              </p>
+              <h2
+                className="text-2xl font-bold tracking-tight"
+                style={{ fontFamily: "var(--font-bitcount), monospace" }}
+              >
+                Produits sponsorisés
+              </h2>
+            </div>
+            <Link
+              href="/sponsored"
+              className="font-mono text-[10px] tracking-widest uppercase transition-colors hover:text-foreground"
+              style={{ color: "var(--muted-fg)" }}
+            >
+              Voir tout →
+            </Link>
+          </div>
+
+          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {sponsoredProducts.slice(0, 4).map((product, i: number) => (
+              <li
+                key={product.id}
+                style={{
+                  animation: `slide-up 0.5s ${i * 0.08}s ease both`,
+                  opacity: 0,
+                  animationFillMode: "forwards",
+                }}
+              >
+                <SponsoredProductCard product={product} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       {/* ── Featured products ── */}
       {featured.length > 0 && (
         <section className="mx-auto max-w-7xl px-6 py-16">
-          {/* Section header */}
           <div className="mb-10 flex items-end justify-between border-b pb-4" style={{ borderColor: "var(--border-color)" }}>
             <div>
               <p className="mb-1 font-mono text-[9px] tracking-[0.2em] uppercase" style={{ color: "var(--accent)" }}>
