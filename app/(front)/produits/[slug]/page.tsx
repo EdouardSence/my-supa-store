@@ -8,22 +8,14 @@ import { formatPrice } from "@/lib/products";
 import AddToCartButton from "@/app/components/AddToCartButton";
 import ProductTabs from "@/app/components/ProductTabs";
 
-// ─── ISR: revalidate every 60 seconds ───────────────────────────────────────
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const revalidate = 60;
+// ─── Dynamic: force server render on every request ───────────────────────────
+export const dynamic = "force-dynamic";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
-
-// ─── Static params ────────────────────────────────────────────────────────────
-
-export async function generateStaticParams() {
-  const products = await getAllProducts();
-  return products.map((p) => ({ slug: p.slug }));
-}
 
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
