@@ -25,6 +25,7 @@ export default async function AdminProduits() {
                             <th className="px-4 py-3 text-left font-medium text-zinc-400">Catégorie</th>
                             <th className="px-4 py-3 text-right font-medium text-zinc-400">Prix</th>
                             <th className="px-4 py-3 text-right font-medium text-zinc-400">Stock</th>
+                            <th className="px-4 py-3 text-right font-medium text-zinc-400">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-zinc-800">
@@ -79,6 +80,14 @@ export default async function AdminProduits() {
                                             />
                                             {product.stock}
                                         </span>
+                                    </td>
+                                    <td className="px-4 py-3 text-right">
+                                        <Link
+                                            href={`/admin/produits/${product.id}`}
+                                            className="inline-flex items-center rounded-md border border-zinc-700 px-2.5 py-1 text-xs text-zinc-300 transition hover:border-zinc-600 hover:text-white"
+                                        >
+                                            Modifier
+                                        </Link>
                                     </td>
                                 </tr>
                             );
