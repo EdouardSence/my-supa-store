@@ -3,9 +3,10 @@ import type { Product } from "@/lib/products";
 
 type Props = {
   products: Product[];
+  abGroup?: "A" | "B";
 };
 
-export default function SimilarProducts({ products }: Props) {
+export default function SimilarProducts({ products, abGroup = "A" }: Props) {
   return (
     <section className="mx-auto max-w-7xl px-6 py-16">
       <div className="mb-10 flex items-end justify-between border-b pb-4" style={{ borderColor: "var(--border-color)" }}>
@@ -31,7 +32,7 @@ export default function SimilarProducts({ products }: Props) {
               animationFillMode: "forwards",
             }}
           >
-            <ProductCard product={p} />
+            <ProductCard product={p} abGroup={abGroup} />
           </li>
         ))}
       </ul>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { getProductBySlug, getAllProducts, getSimilarProducts } from "@/lib/queries";
 import { formatPrice } from "@/lib/products";
 import AddToCartButton from "@/app/components/AddToCartButton";
@@ -97,10 +98,10 @@ async function ProductInfo({ slug }: { slug: string }) {
   );
 }
 
-async function SimilarSection({ productId }: { productId: string }) {
+async function SimilarSection({ productId, abGroup }: { productId: string; abGroup: "A" | "B" }) {
   const similar = await getSimilarProducts(productId);
   if (similar.length === 0) return null;
-  return <SimilarProducts products={similar} />;
+  return <SimilarProducts products={similar} abGroup={abGroup} />;
 }
 
 async function SponsoredSection() {
@@ -111,6 +112,10 @@ async function SponsoredSection() {
 
 export default async function ProductPage({ params }: PageProps) {
   const { slug } = await params;
+  const cookieStore = await cookies();
+  const abCookie = cookieStore.get("ab_group")?.value;
+  const abGroup = abCookie === "B" ? "B" : "A";
+
   const product = await getProductBySlug(slug);
 
   if (!product) {
@@ -186,7 +191,7 @@ export default async function ProductPage({ params }: PageProps) {
       </div>
 
       <Suspense fallback={<SimilarProductsSkeleton />}>
-        <SimilarSection productId={product.id} />
+        <SimilarSection productId={product.id} abGroup={abGroup} />
       </Suspense>
 
       <Suspense fallback={<SponsoredProductsSkeleton />}>

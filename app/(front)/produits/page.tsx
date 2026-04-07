@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { getAllProducts } from "@/lib/queries";
 import ProductCard from "@/app/components/ProductCard";
 
@@ -7,6 +8,10 @@ export const metadata = {
 };
 
 export default async function ProduitsPage() {
+  const cookieStore = await cookies();
+  const abCookie = cookieStore.get("ab_group")?.value;
+  const abGroup = abCookie === "B" ? "B" : "A";
+
   const products = await getAllProducts();
 
   return (
@@ -58,7 +63,7 @@ export default async function ProduitsPage() {
           <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {products.map((product) => (
               <li key={product.id}>
-                <ProductCard product={product} />
+                <ProductCard product={product} abGroup={abGroup} />
               </li>
             ))}
           </ul>

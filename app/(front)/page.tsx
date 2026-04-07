@@ -1,10 +1,15 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { getHomeProducts } from "@/lib/queries";
 import { getSponsoredProducts } from "@/lib/graphql/client";
 import ProductCard from "@/app/components/ProductCard";
 import SponsoredProductsSection from "@/app/components/SponsoredProductsSection";
 
 export default async function HomePage() {
+  const cookieStore = await cookies();
+  const abCookie = cookieStore.get("ab_group")?.value;
+  const abGroup = abCookie === "B" ? "B" : "A";
+
   const [products, sponsoredProducts] = await Promise.all([
     getHomeProducts(),
     getSponsoredProducts(),
@@ -118,7 +123,7 @@ export default async function HomePage() {
                   animationFillMode: "forwards",
                 }}
               >
-                <ProductCard product={product} />
+                <ProductCard product={product} abGroup={abGroup} />
               </li>
             ))}
           </ul>

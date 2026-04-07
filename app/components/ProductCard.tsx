@@ -1,20 +1,22 @@
 import Image from "next/image";
-import Link from "next/link";
 import { type Product, formatPrice } from "@/lib/products";
+import PrefetchLink from "./PrefetchLink";
 
 type ProductCardProps = {
   product: Product;
+  abGroup?: "A" | "B";
 };
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, abGroup = "A" }: ProductCardProps) {
   const { name, slug, price, currency, stock, category, brand, images } = product;
 
   const inStock = stock > 0;
   const lowStock = stock > 0 && stock <= 10;
 
   return (
-    <Link
+    <PrefetchLink
       href={`/produits/${slug}`}
+      abGroup={abGroup}
       className="group relative block overflow-hidden bg-[--card-bg]"
       style={{ border: "1px solid var(--border-color)" }}
     >
@@ -69,6 +71,6 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
         </div>
       </div>
-    </Link>
+    </PrefetchLink>
   );
 }
