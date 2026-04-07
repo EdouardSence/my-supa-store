@@ -38,5 +38,5 @@ export const getSimilarProducts = cache(async (productId: string): Promise<Produ
       similarProduct: true,
     },
   });
-  return toProducts(rows.map((r: { similarProduct: unknown }) => r.similarProduct));
+  return toProducts(rows.map((r) => r.similarProduct));
 });
