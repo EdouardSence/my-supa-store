@@ -1,6 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import type { Product } from "@/lib/products";
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
+
+export const HOME_PRODUCTS_TAG = "home-products";
 
 function toProduct(raw: Awaited<ReturnType<typeof prisma.product.findFirst>>): Product | null {
   if (!raw) return null;
@@ -18,6 +21,24 @@ export async function getAllProducts(): Promise<Product[]> {
     orderBy: { createdAt: "asc" },
   });
   return toProducts(rows);
+}
+
+const getHomeProductsCachedInternal = unstable_cache(
+  async (): Promise<Product[]> => {
+    const rows = await prisma.product.findMany({
+      orderBy: { createdAt: "asc" },
+    });
+    return toProducts(rows);
+  },
+  ["home-products-v1"],
+  {
+    revalidate: 3600,
+    tags: [HOME_PRODUCTS_TAG],
+  },
+);
+
+export async function getHomeProducts(): Promise<Product[]> {
+  return getHomeProductsCachedInternal();
 }
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {

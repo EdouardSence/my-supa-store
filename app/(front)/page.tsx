@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { getAllProducts } from "@/lib/queries";
+import { getHomeProducts } from "@/lib/queries";
 import { getSponsoredProducts } from "@/lib/graphql/client";
 import ProductCard from "@/app/components/ProductCard";
 import SponsoredProductsSection from "@/app/components/SponsoredProductsSection";
 
 export default async function HomePage() {
   const [products, sponsoredProducts] = await Promise.all([
-    getAllProducts(),
+    getHomeProducts(),
     getSponsoredProducts(),
   ]);
 

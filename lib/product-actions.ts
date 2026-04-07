@@ -1,8 +1,9 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { productFormSchema } from "@/lib/product-schema";
+import { HOME_PRODUCTS_TAG } from "@/lib/queries";
 import type { ProductFormState } from "@/lib/product-schema";
 
 export async function updateProductAction(
@@ -54,6 +55,7 @@ export async function updateProductAction(
   }
   revalidatePath(`/produits/${slug}`);
   revalidatePath("/");
+  revalidateTag(HOME_PRODUCTS_TAG, "max");
 
   return { error: null, success: "Produit mis à jour avec succès.", values: null };
 }

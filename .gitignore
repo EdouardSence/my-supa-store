@@ -45,3 +45,4 @@ AGENTS.md
 .agents/
 .claude/
 skills-lock.json
+.playwright-mcp/
