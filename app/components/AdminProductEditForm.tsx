@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { updateProductAction } from "@/lib/product-actions";
+import { testErrorAction, updateProductAction } from "@/lib/product-actions";
 import { PRODUCT_FORM_INITIAL_STATE } from "@/lib/product-schema";
 
 type EditableProduct = {
@@ -22,6 +22,10 @@ type AdminProductEditFormProps = {
 
 export default function AdminProductEditForm({ product }: AdminProductEditFormProps) {
   const [state, formAction, pending] = useActionState(updateProductAction, PRODUCT_FORM_INITIAL_STATE);
+  const [testState, testFormAction, testPending] = useActionState(testErrorAction, PRODUCT_FORM_INITIAL_STATE);
+
+  const currentState = testState.error || testState.success ? testState : state;
+  const isPending = pending || testPending;
 
   return (
     <form action={formAction} className="space-y-5">
@@ -33,7 +37,7 @@ export default function AdminProductEditForm({ product }: AdminProductEditFormPr
           <input
             id="name"
             name="name"
-            defaultValue={state.values?.name ?? product.name}
+            defaultValue={currentState.values?.name ?? product.name}
             required
             className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 outline-none transition focus:border-zinc-500"
           />
@@ -44,7 +48,7 @@ export default function AdminProductEditForm({ product }: AdminProductEditFormPr
           <input
             id="slug"
             name="slug"
-            defaultValue={state.values?.slug ?? product.slug}
+            defaultValue={currentState.values?.slug ?? product.slug}
             required
             className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 outline-none transition focus:border-zinc-500"
           />
@@ -55,7 +59,7 @@ export default function AdminProductEditForm({ product }: AdminProductEditFormPr
           <textarea
             id="description"
             name="description"
-            defaultValue={state.values?.description ?? product.description}
+            defaultValue={currentState.values?.description ?? product.description}
             rows={4}
             required
             className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 outline-none transition focus:border-zinc-500"
@@ -70,7 +74,7 @@ export default function AdminProductEditForm({ product }: AdminProductEditFormPr
             type="number"
             step="0.01"
             min="0"
-            defaultValue={state.values?.price ?? product.price}
+            defaultValue={currentState.values?.price ?? product.price}
             required
             className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 outline-none transition focus:border-zinc-500"
           />
@@ -84,7 +88,7 @@ export default function AdminProductEditForm({ product }: AdminProductEditFormPr
             type="number"
             step="1"
             min="0"
-            defaultValue={state.values?.stock ?? product.stock}
+            defaultValue={currentState.values?.stock ?? product.stock}
             required
             className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 outline-none transition focus:border-zinc-500"
           />
@@ -95,7 +99,7 @@ export default function AdminProductEditForm({ product }: AdminProductEditFormPr
           <input
             id="sku"
             name="sku"
-            defaultValue={state.values?.sku ?? product.sku}
+            defaultValue={currentState.values?.sku ?? product.sku}
             required
             className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 outline-none transition focus:border-zinc-500"
           />
@@ -106,7 +110,7 @@ export default function AdminProductEditForm({ product }: AdminProductEditFormPr
           <input
             id="category"
             name="category"
-            defaultValue={state.values?.category ?? product.category}
+            defaultValue={currentState.values?.category ?? product.category}
             required
             className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 outline-none transition focus:border-zinc-500"
           />
@@ -117,22 +121,32 @@ export default function AdminProductEditForm({ product }: AdminProductEditFormPr
           <input
             id="brand"
             name="brand"
-            defaultValue={state.values?.brand ?? product.brand}
+            defaultValue={currentState.values?.brand ?? product.brand}
             required
             className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 outline-none transition focus:border-zinc-500"
           />
         </div>
       </div>
 
-      {state.error && <p className="text-sm text-red-400">{state.error}</p>}
-      {state.success && <p className="text-sm text-emerald-400">{state.success}</p>}
+      {currentState.error && <p className="text-sm text-red-400">{currentState.error}</p>}
+      {currentState.success && <p className="text-sm text-emerald-400">{currentState.success}</p>}
 
       <button
         type="submit"
-        disabled={pending}
+        disabled={isPending}
         className="rounded-lg bg-white px-4 py-2 text-sm font-medium text-zinc-900 transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {pending ? "Enregistrement..." : "Enregistrer les modifications"}
+        {isPending ? "Enregistrement..." : "Enregistrer les modifications"}
+      </button>
+
+      <button
+        type="submit"
+        formAction={testFormAction}
+        formNoValidate
+        disabled={isPending}
+        className="ml-3 rounded-lg border border-red-700 px-4 py-2 text-sm font-medium text-red-300 transition hover:bg-red-900/20 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {isPending ? "Test..." : "Test d'erreur"}
       </button>
     </form>
   );
