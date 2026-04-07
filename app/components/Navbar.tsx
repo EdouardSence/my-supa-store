@@ -1,12 +1,25 @@
 import Link from "next/link";
 import CartCount from "./CartCount";
+import { auth } from "@/auth";
+import LogoutButton from "./LogoutButton";
 
 const navLinks = [
   { href: "/produits", label: "Catalogue" },
   { href: "/a-propos", label: "À propos" },
 ];
 
-export default function Navbar() {
+function getTrigram(name: string | null | undefined, fallback: string): string {
+  const source = (name?.trim() || fallback.trim()).toUpperCase();
+  const lettersOnly = source.replace(/[^A-ZÀ-ÖØ-Ý]/g, "");
+  return (lettersOnly.slice(0, 3) || "USR").padEnd(3, "X");
+}
+
+export default async function Navbar() {
+  const session = await auth();
+  const user = session?.user;
+  const trigram = user ? getTrigram(user.name, user.email ?? "USR") : null;
+  const isAdmin = user?.role === "ADMIN";
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[--border-color] bg-[--background]/90 backdrop-blur-md">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
@@ -41,18 +54,32 @@ export default function Navbar() {
         {/* Actions */}
         <div className="flex items-center gap-5">
           <CartCount />
-          <Link
-            href="/admin"
-            className="font-mono text-[11px] tracking-widest text-[--muted-fg] uppercase transition-colors hover:text-foreground"
-          >
-            Admin
-          </Link>
-          <Link
-            href="/connexion"
-            className="rounded-none border border-foreground/20 px-4 py-1.5 font-mono text-[11px] tracking-widest uppercase transition-all hover:border-accent hover:text-accent"
-          >
-            Connexion
-          </Link>
+          {isAdmin && (
+            <Link
+              href="/admin"
+              className="font-mono text-[11px] tracking-widest text-[--muted-fg] uppercase transition-colors hover:text-foreground"
+            >
+              Admin
+            </Link>
+          )}
+          {user ? (
+            <div className="flex items-center gap-3">
+              <Link
+                href="/espace-protege"
+                className="font-mono text-[11px] tracking-widest text-[--muted-fg] uppercase transition-colors hover:text-foreground"
+              >
+                {trigram}
+              </Link>
+              <LogoutButton />
+            </div>
+          ) : (
+            <Link
+              href="/connexion"
+              className="rounded-none border border-foreground/20 px-4 py-1.5 font-mono text-[11px] tracking-widest uppercase transition-all hover:border-accent hover:text-accent"
+            >
+              Connexion
+            </Link>
+          )}
         </div>
       </nav>
     </header>
