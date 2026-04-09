@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
+import PwaRegister from "@/app/components/PwaRegister";
 import { WebVitals } from "@/app/components/web-vitals";
 import "./globals.css";
 
@@ -50,6 +51,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${bitcount.variable} antialiased`}
       >
         {children}
+        <PwaRegister />
         <WebVitals />
       </body>
     </html>
