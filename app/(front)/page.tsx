@@ -4,6 +4,7 @@ import { getHomeProducts } from "@/lib/queries";
 import { getSponsoredProducts } from "@/lib/graphql/client";
 import ProductCard from "@/app/components/ProductCard";
 import SponsoredProductsSection from "@/app/components/SponsoredProductsSection";
+import EnvClientTest from "@/app/components/EnvClientTest";
 
 export default async function HomePage() {
   const cookieStore = await cookies();
@@ -144,6 +145,8 @@ export default async function HomePage() {
           MY SUPA STORE — DESIGN &amp; QUALITÉ — LIVRAISON RAPIDE — RETOURS FACILES
         </p>
       </section>
+
+      <EnvClientTest />
     </div>
   );
 }
