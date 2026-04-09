@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { getProductBySlug, getAllProducts, getSimilarProducts } from "@/lib/queries";
+import { prisma } from "@/lib/prisma";
 import { formatPrice } from "@/lib/products";
 import AddToCartButton from "@/app/components/AddToCartButton";
 import ProductTabs from "@/app/components/ProductTabs";
@@ -19,15 +20,46 @@ type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
+function getFirstGalleryImage(images: unknown): string | null {
+  if (!images || typeof images !== "object") return null;
+
+  const gallery = (images as { gallery?: unknown }).gallery;
+  if (!Array.isArray(gallery)) return null;
+
+  const first = gallery.find((value): value is string => typeof value === "string" && value.length > 0);
+  return first ?? null;
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  const product = await prisma.product.findUnique({
+    where: { slug },
+    select: {
+      name: true,
+      description: true,
+      images: true,
+    },
+  });
 
   if (!product) return { title: "Produit introuvable" };
 
+  const firstGalleryImage = getFirstGalleryImage(product.images);
+
   return {
-    title: `${product.name} — My Supa Store`,
+    title: product.name,
     description: product.description,
+    openGraph: {
+      title: product.name,
+      description: product.description,
+      images: firstGalleryImage
+        ? [
+            {
+              url: firstGalleryImage,
+              alt: product.name,
+            },
+          ]
+        : undefined,
+    },
   };
 }
 

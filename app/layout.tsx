@@ -20,8 +20,23 @@ const bitcount = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "My Supa Store",
-  description: "La boutique en ligne pour tous vos besoins.",
+  title: {
+    default: "Ma Boutique",
+    template: "%s | Ma Boutique",
+  },
+  description: "Découvrez Ma Boutique, votre sélection de produits tech et lifestyle au meilleur prix.",
+  keywords: ["boutique en ligne", "e-commerce", "produits tech", "accessoires", "ma boutique"],
+  robots: {
+    index: true,
+    follow: true,
+  },
+  openGraph: {
+    type: "website",
+    locale: "fr_FR",
+    siteName: "Ma Boutique",
+    title: "Ma Boutique",
+    description: "Découvrez Ma Boutique, votre sélection de produits tech et lifestyle au meilleur prix.",
+  },
 };
 
 export default function RootLayout({
